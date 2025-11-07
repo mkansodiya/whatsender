@@ -1,42 +1,36 @@
-# Laravel / PHP
+/node_modules
+/public/build
+/public/hot
 /vendor/
-/bootstrap/cache/
-/storage/app/
-/storage/debugbar/
-/storage/framework/cache/
-/storage/framework/sessions/
-/storage/framework/testing/
-/storage/logs/
-/public/uploads/
-/sessions/
-/.env*
-
-# Node / front-end
 /node_modules/
-/public/assets/frontend/dist/
-/public/assets/backend/dist/
+
+/bootstrap/cache/
+
+/public/build/
+/public/hot/
+/public/storage/
+/public/uploads/
 /public/temp/
 
-# Logs & runtime files
-*.log
-*.pid
-storage/*.key
+/sessions/
+/storage/
+!/storage/*.gitignore
+!/storage/*/.gitignore
 
-# IDE / tooling
-.idea/
-.vscode/
-.DS_Store
-Thumbs.db
+.env
+.env.*
+/.env
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
 
-# Docker artifacts
-/docker/redis/
-/docker/*.log
-
-# Misc
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-composer.lock
-package-lock.json
-/public/storage
 
+/.DS_Store
+*/.DS_Store
+/.fleet/
+/.idea/
+/.vscode/
