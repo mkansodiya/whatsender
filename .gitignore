@@ -1,0 +1,42 @@
+# Laravel / PHP
+/vendor/
+/bootstrap/cache/
+/storage/app/
+/storage/debugbar/
+/storage/framework/cache/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/logs/
+/public/uploads/
+/sessions/
+/.env*
+
+# Node / front-end
+/node_modules/
+/public/assets/frontend/dist/
+/public/assets/backend/dist/
+/public/temp/
+
+# Logs & runtime files
+*.log
+*.pid
+storage/*.key
+
+# IDE / tooling
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Docker artifacts
+/docker/redis/
+/docker/*.log
+
+# Misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+composer.lock
+package-lock.json
+/public/storage
+

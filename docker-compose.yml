@@ -1,0 +1,162 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: /Users/mkansodiya/Downloads/codecanyon-3neudhKk-wasender-whatsapp-server-and-bulk-sender-saas/whatsender
+      dockerfile: docker/php/Dockerfile
+      target: php-runtime
+    image: whats-wasender-php
+    container_name: wasender-app
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: http://localhost
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: wasender
+      DB_USERNAME: wasender
+      DB_PASSWORD: wasender
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: database
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      WA_SERVER_URL: http://wa-server:8000
+    volumes:
+      - storage:/var/www/html/storage
+      - uploads:/var/www/html/public/uploads
+      - sessions-data:/var/www/html/sessions
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  queue:
+    image: whats-wasender-php
+    container_name: wasender-queue
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=3 --tries=3
+    env_file:
+      - .env.docker
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: wasender
+      DB_USERNAME: wasender
+      DB_PASSWORD: wasender
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: database
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      WA_SERVER_URL: http://wa-server:8000
+    volumes:
+      - storage:/var/www/html/storage
+      - uploads:/var/www/html/public/uploads
+      - sessions-data:/var/www/html/sessions
+    depends_on:
+      app:
+        condition: service_started
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  scheduler:
+    image: whats-wasender-php
+    container_name: wasender-scheduler
+    restart: unless-stopped
+    command: php artisan schedule:work
+    env_file:
+      - .env.docker
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: wasender
+      DB_USERNAME: wasender
+      DB_PASSWORD: wasender
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: database
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      WA_SERVER_URL: http://wa-server:8000
+    volumes:
+      - storage:/var/www/html/storage
+      - uploads:/var/www/html/public/uploads
+      - sessions-data:/var/www/html/sessions
+    depends_on:
+      app:
+        condition: service_started
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  web:
+    build:
+      context: /Users/mkansodiya/Downloads/codecanyon-3neudhKk-wasender-whatsapp-server-and-bulk-sender-saas/whatsender
+      dockerfile: docker/php/Dockerfile
+      target: nginx-runtime
+    container_name: wasender-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - storage:/var/www/html/storage
+      - uploads:/var/www/html/public/uploads
+    depends_on:
+      - app
+
+  wa-server:
+    build:
+      context: /Users/mkansodiya/Downloads/codecanyon-3neudhKk-wasender-whatsapp-server-and-bulk-sender-saas/whatsender
+      dockerfile: docker/node/Dockerfile
+    image: whats-wasender-wa
+    container_name: wasender-wa
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      WA_SERVER_PORT: 8000
+      WA_SERVER_HOST: 0.0.0.0
+    ports:
+      - "8002:8000"
+    volumes:
+      - sessions-data:/usr/src/app/sessions
+
+  db:
+    image: mysql:8.0
+    container_name: wasender-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wasender
+      MYSQL_USER: wasender
+      MYSQL_PASSWORD: wasender
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "33060:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: wasender-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+volumes:
+  storage:
+  uploads:
+  sessions-data:
+  db-data:
+  redis-data:
+
