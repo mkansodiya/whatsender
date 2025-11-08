@@ -6,12 +6,6 @@
 
 /bootstrap/cache/
 
-/public/build/
-/public/hot/
-/public/storage/
-/public/uploads/
-/public/temp/
-
 /sessions/
 /storage/
 !/storage/*.gitignore
